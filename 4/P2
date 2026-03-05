@@ -1,0 +1,97 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <fstream>
+using namespace std;
+
+// Глобальный счетчик операций
+long long operationCount = 0;
+
+// Функция разделения массива (Хоара) со счетчиком
+int partition(vector<int>& arr, int low, int high) {
+    int pivot = arr[low];
+    int i = low - 1;
+    int j = high + 1;
+    
+    while (true) {
+        // Считаем сравнения при движении i
+        do {
+            i++;
+            operationCount++; // сравнение arr[i] < pivot
+        } while (arr[i] < pivot);
+        
+        // Считаем сравнения при движении j
+        do {
+            j--;
+            operationCount++; // сравнение arr[j] > pivot
+        } while (arr[j] > pivot);
+        
+        if (i >= j) return j;
+        
+        // Считаем обмен
+        swap(arr[i], arr[j]);
+        operationCount++; // операция обмена
+    }
+}
+
+// Рекурсивная функция быстрой сортировки
+void quickSort(vector<int>& arr, int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+// Функция для сохранения результатов
+void saveResults(const string& filename, int n, long long operations) {
+    ofstream file(filename, ios::app);
+    if (file.is_open()) {
+        file << n << " " << operations << endl;
+        file.close();
+    }
+}
+
+int main() {
+    srand(time(nullptr));
+    
+    cout << "Программа P2: Быстрая сортировка со счетчиком операций\n";
+    cout << "==================================================\n";
+    
+    // Тестовые размеры массивов
+    vector<int> testSizes = {100, 500, 1000, 5000, 10000};
+    
+    for (int n : testSizes) {
+        cout << "\nТестирование на массиве размером " << n << ":\n";
+        
+        // Создаем случайный массив
+        vector<int> arr(n);
+        for (int i = 0; i < n; i++) {
+            arr[i] = rand() % 10000;
+        }
+        
+        // Обнуляем счетчик перед сортировкой
+        operationCount = 0;
+        
+        // Сортируем
+        quickSort(arr, 0, n - 1);
+        
+        // Выводим результат
+        cout << "Количество операций: " << operationCount << endl;
+        
+        // Сохраняем в файл
+        saveResults("operations.txt", n, operationCount);
+        
+        // Проверяем правильность сортировки (первые 10 элементов)
+        cout << "Первые 10 элементов после сортировки: ";
+        for (int i = 0; i < min(10, n); i++) {
+            cout << arr[i] << " ";
+        }
+        cout << endl;
+    }
+    
+    cout << "\nРезультаты сохранены в файл operations.txt" << endl;
+    
+    return 0;
+}
