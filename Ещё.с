@@ -1,0 +1,95 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
+using namespace std;
+
+// Подсчёт операций умножения
+long long powerCounter(long long a, long long n, long long &multCount) {
+    long long result = 1;
+    multCount = 0;
+    
+    for (long long i = 0; i < n; i++) {
+        result *= a;
+        multCount++;
+    }
+    return result;
+}
+
+// Быстрое возведение в степень (бинарное)
+long long fastPower(long long a, long long n, long long &multCount) {
+    long long result = 1;
+    multCount = 0;
+    
+    while (n > 0) {
+        if (n % 2 == 1) {
+            result *= a;
+            multCount++;
+        }
+        a *= a;
+        multCount++;
+        n /= 2;
+    }
+    return result;
+}
+
+int main() {
+    srand(time(0));
+    cout << "=== Анализ сложности возведения в степень ===\n\n";
+    
+    // Тест 1: Маленькие числа (низкая сложность)
+    cout << "1. Низкая сложность (n <= 10):\n";
+    long long multCountNaive, multCountFast;
+    long long a = 3, n = 5;
+    
+    long long resNaive = powerCounter(a, n, multCountNaive);
+    long long resFast = fastPower(a, n, multCountFast);
+    
+    cout << "   " << a << "^" << n << " = " << resNaive << endl;
+    cout << "   Наивный: " << multCountNaive << " умножений" << endl;
+    cout << "   Бинарный: " << multCountFast << " умножений\n\n";
+    
+    // Тест 2: Средняя сложность (случайные числа)
+    cout << "2. Средняя сложность (случайные n от 10 до 100):\n";
+    a = 2; // маленькое основание
+    n = rand() % 91 + 10; // от 10 до 100
+    
+    powerCounter(a, n, multCountNaive);
+    fastPower(a, n, multCountFast);
+    
+    cout << "   " << a << "^" << n << endl;
+    cout << "   Наивный: O(n) = " << multCountNaive << " умножений" << endl;
+    cout << "   Бинарный: O(log n) = " << multCountFast << " умножений\n\n";
+    
+    // Тест 3: Максимальная сложность (n большое)
+    cout << "3. Максимальная сложность (n ≈ 10^6, симуляция):\n";
+    cout << "   При n = 1,000,000:\n";
+    cout << "   Наивный алгоритм: ~1,000,000 операций (не выполняется)\n";
+    cout << "   Бинарный алгоритм: ~" << (int)log2(1000000) * 2 << " операций\n\n";
+    
+    // Тест 4: Сравнение эффективности
+    cout << "4. Сравнение для разных n (a=2):\n";
+    cout << "   n        Наивный    Бинарный   Выигрыш\n";
+    cout << "   --------------------------------------\n";
+    
+    for (int exp : {10, 100, 1000, 10000}) {
+        fastPower(2, exp, multCountFast);
+        cout << "   " << exp << "\t" << exp << "\t  " << multCountFast << "\t  ";
+        printf("%.1fx\n", (double)exp / multCountFast);
+    }
+    
+    // Анализ сложности
+    cout << "\n=== АНАЛИЗ СЛОЖНОСТИ ===\n";
+    cout << "• Низкая (n ≤ 10):  Наивный - O(n), Бинарный - O(log n)\n";
+    cout << "  Оба работают быстро, разница незаметна.\n\n";
+    
+    cout << "• Средняя (10 < n < 10^4): Наивный ~ n операций\n";
+    cout << "  Бинарный ~ 2*log2(n) операций\n";
+    cout << "  Пример: n=1000 → выигрыш ~ 1000/20 = 50 раз\n\n";
+    
+    cout << "• Максимальная (n > 10^6): Наивный НЕПРИМЕНИМ\n";
+    cout << "  Бинарный: O(log n) ≈ 40-60 операций\n";
+    cout << "  (при n = 10^9 нужно всего ~60 умножений)\n";
+    
+    return 0;
+}
